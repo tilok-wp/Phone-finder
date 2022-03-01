@@ -11,18 +11,17 @@ const getSearchText = () => {
         const searchMessage = cleanInnerHtml('search-message')
         searchMessage.classList.add('text-danger')
         searchMessage.innerText = `Please write some text`
-
     }
     searchText.value = ''
 }
-
+// Load data from API
 const loadPhoneData = searchText => {
     const url = `https://openapi.programming-hero.com/api/phones?search=${searchText}`
     fetch(url)
     .then(request => request.json())
     .then(dataObject => displaySearchResult(dataObject.data))
 }
-
+// Display result option
 const displaySearchResult = (phoneList) =>{
     const searchResult = cleanInnerHtml('search-result')
     searchResult.innerHTML = ''
@@ -31,15 +30,13 @@ const displaySearchResult = (phoneList) =>{
     if(phoneList.length > 0){
         searchMessage.classList.remove('text-danger')
         searchMessage.innerText = `Search result: ${phoneList.length} Phones found`
-        
     }else{
         searchMessage.classList.add('text-danger')
         searchMessage.innerText = `No phone Found`
     }
-
     let count = 1
     phoneList.forEach(phone => {
-        if(count <=2000){
+        if(count <=20){
             const div = document.createElement('div')
             div.classList.add('col-12')
             div.classList.add('col-md-4')
@@ -56,10 +53,8 @@ const displaySearchResult = (phoneList) =>{
             `
             searchResult.appendChild(div)
             count++
-
         }
     });
-
 }
 
 const loadDetails = (idName) => {
@@ -67,26 +62,24 @@ const loadDetails = (idName) => {
     fetch(url)
     .then(request => request.json())
     .then(dataObject => displayPhoneDetails(dataObject.data))
-
 }
-
+// Display phone data
 const displayPhoneDetails = (data) => {
     const phoneDetails = cleanInnerHtml('phone-details')
-    // console.log(data)
     const div = document.createElement('div')
-    div.classList.add('col-8')
+    div.classList.add('col-md-8')
     div.classList.add('offset-md-2')
     div.innerHTML = `
-        <div class="card d-flex p-3 my-3">
+        <div class="card d-flex pt-3 my-3">
             <div class="row">
-                <div class="col-md-5">
+                <div class="col-md-5 text-center">
                     <img src="${properityContent(data?.image)}" class="card-img-top" alt="Phone Image">
                 </div>
                 <div class="col-md-7 my-3">
                     <h3 class="card-title">${properityContent(data?.name)}</h3>
                     <p class="card-text"><strong> Brand:</strong> ${properityContent(data?.brand)}</p>
                     <p class="card-text"><strong> ReleaseDate:</strong> ${properityContent(data?.releaseDate)}</p>
-                    <p class="card-text"><strong> Sensors:</strong> ${properityContent(data?.mainFeatures?.sensors.toString())}</p>
+                    <p class="card-text"><strong> Sensors:</strong> ${properityContent(data?.mainFeatures?.sensors.join(', '))}</p>
                 </div>
                 <div class="col-md-12">
                     <h4 class="card-title mt-5">Main Feature</h4>
@@ -94,22 +87,15 @@ const displayPhoneDetails = (data) => {
                     <p class="card-text"><strong>DisplaySize:</strong> ${properityContent(data?.mainFeatures?.displaySize)}</p>
                     <p class="card-text"><strong>Memory:</strong> ${properityContent(data?.mainFeatures?.memory)}</p>
                     <p class="card-text"><strong>Storage:</strong> ${properityContent(data?.mainFeatures?.storage)}</p>
+                    <h4 class="card-title mt-3">Others</h4>
+                    ${othersInfo(data?.others)}
                 </div>
-            </div>         
+            </div>      
         `
         phoneDetails.appendChild(div)
-
-
-    console.log(data?.mainFeatures)
-    // console.log(properityContent(data?.others))
-    // console.log(properityContent(data?.releaseDate))
-    // console.log(typeof(data?.releaseDate))
-    // console.log(data?.releaseDate)
-    // console.log(properityContent(data?.mainFeatures))
-    // console.log(properityContent(data?.mainFeatures?.sensors.toString()))
 }
 
-
+// Check object properity avaiable
 const properityContent = (target) => {
     if(target != undefined && target != ''){
         return  target
@@ -117,9 +103,21 @@ const properityContent = (target) => {
         return ' info Not available'
     }
 }
-
+// Inner html clean
 const cleanInnerHtml = (id) => {
    const element =  document.getElementById(id)
    element.innerHTML = ''
    return element
+}
+// Get others information
+const othersInfo =  (dataObject) => {
+    if(dataObject != undefined && dataObject != ''){
+        let paragraph = ''
+        for (const single in dataObject) {
+            paragraph += `<p><strong>${single}: </strong> ${dataObject[single]}</p>`
+        }
+        return paragraph
+    }else {
+        return 'No Others information found'
+    }
 }
