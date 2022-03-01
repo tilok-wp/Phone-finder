@@ -24,7 +24,7 @@ const loadPhoneData = searchText => {
 // Display result option
 const displaySearchResult = (phoneList) =>{
     const searchResult = cleanInnerHtml('search-result')
-    searchResult.innerHTML = ''
+    // searchResult.innerHTML = ''
     const searchMessage = cleanInnerHtml('search-message')
     console.log()
     if(phoneList.length > 0){
@@ -37,7 +37,21 @@ const displaySearchResult = (phoneList) =>{
     let count = 1
     phoneList.forEach(phone => {
         if(count <=20){
-            const div = document.createElement('div')
+            singleSearchContent(phone, searchResult)
+            count++
+        }
+    });
+}
+
+const loadDetails = (idName) => {
+    const url = `https://openapi.programming-hero.com/api/phone/${idName}`
+    fetch(url)
+    .then(request => request.json())
+    .then(dataObject => displayPhoneDetails(dataObject.data))
+}
+// Single search congent
+const singleSearchContent = (phone, reultContainer) => {
+    const div = document.createElement('div')
             div.classList.add('col-12')
             div.classList.add('col-md-4')
             div.classList.add('my-3')
@@ -51,17 +65,7 @@ const displaySearchResult = (phoneList) =>{
                     </div>
                 </div>
             `
-            searchResult.appendChild(div)
-            count++
-        }
-    });
-}
-
-const loadDetails = (idName) => {
-    const url = `https://openapi.programming-hero.com/api/phone/${idName}`
-    fetch(url)
-    .then(request => request.json())
-    .then(dataObject => displayPhoneDetails(dataObject.data))
+            reultContainer.appendChild(div)
 }
 // Display phone data
 const displayPhoneDetails = (data) => {
@@ -70,7 +74,7 @@ const displayPhoneDetails = (data) => {
     div.classList.add('col-md-8')
     div.classList.add('offset-md-2')
     div.innerHTML = `
-        <div class="card d-flex pt-3 my-3">
+        <div class="card d-flex p-5 my-3">
             <div class="row">
                 <div class="col-md-5 text-center">
                     <img src="${properityContent(data?.image)}" class="card-img-top" alt="Phone Image">
@@ -82,7 +86,7 @@ const displayPhoneDetails = (data) => {
                     <p class="card-text"><strong> Sensors:</strong> ${properityContent(data?.mainFeatures?.sensors.join(', '))}</p>
                 </div>
                 <div class="col-md-12">
-                    <h4 class="card-title mt-5">Main Feature</h4>
+                    <h4 class="card-title mt-5">Main Features</h4>
                     <p class="card-text"><strong>ChipSet:</strong> ${properityContent(data?.mainFeatures?.chipSet)}</p>
                     <p class="card-text"><strong>DisplaySize:</strong> ${properityContent(data?.mainFeatures?.displaySize)}</p>
                     <p class="card-text"><strong>Memory:</strong> ${properityContent(data?.mainFeatures?.memory)}</p>
