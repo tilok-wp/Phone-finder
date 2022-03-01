@@ -4,8 +4,11 @@ const getSearchText = () => {
     let searchValue = searchText.value.toLowerCase()
     if(searchValue != ''){
         loadPhoneData(searchValue)
+        cleanInnerHtml('phone-details')
     }else{
-        const searchMessage = document.getElementById('search-message')
+        cleanInnerHtml('search-result')
+        cleanInnerHtml('phone-details')
+        const searchMessage = cleanInnerHtml('search-message')
         searchMessage.classList.add('text-danger')
         searchMessage.innerText = `Please write some text`
 
@@ -21,9 +24,9 @@ const loadPhoneData = searchText => {
 }
 
 const displaySearchResult = (phoneList) =>{
-    const searchResult = document.getElementById('search-result')
+    const searchResult = cleanInnerHtml('search-result')
     searchResult.innerHTML = ''
-    const searchMessage = document.getElementById('search-message')
+    const searchMessage = cleanInnerHtml('search-message')
     console.log()
     if(phoneList.length > 0){
         searchMessage.classList.remove('text-danger')
@@ -68,21 +71,55 @@ const loadDetails = (idName) => {
 }
 
 const displayPhoneDetails = (data) => {
-    const phoneDetails = document.getElementById('phone-details')
-    phoneDetails.innerHTML = ''
+    const phoneDetails = cleanInnerHtml('phone-details')
+    // console.log(data)
     const div = document.createElement('div')
-    div.classList.add('col-12')
-    div.classList.add('my-3')
+    div.classList.add('col-8')
+    div.classList.add('offset-md-2')
     div.innerHTML = `
-        <div class="card d-flex flex-row p-3">
-            <img src="${data.image}" class="card-img-top" alt="${data.phone_name}">
-            <div class="card-body">
-            <h5 class="card-title">${data.name}</h5>
-            <p class="card-text">Brand: ${data.brand}</p>
-            </div>
-        </div>
-    `
-    phoneDetails.appendChild(div)
+        <div class="card d-flex p-3 my-3">
+            <div class="row">
+                <div class="col-md-5">
+                    <img src="${properityContent(data?.image)}" class="card-img-top" alt="Phone Image">
+                </div>
+                <div class="col-md-7 my-3">
+                    <h3 class="card-title">${properityContent(data?.name)}</h3>
+                    <p class="card-text"><strong> Brand:</strong> ${properityContent(data?.brand)}</p>
+                    <p class="card-text"><strong> ReleaseDate:</strong> ${properityContent(data?.releaseDate)}</p>
+                    <p class="card-text"><strong> Sensors:</strong> ${properityContent(data?.mainFeatures?.sensors.toString())}</p>
+                </div>
+                <div class="col-md-12">
+                    <h4 class="card-title mt-5">Main Feature</h4>
+                    <p class="card-text"><strong>ChipSet:</strong> ${properityContent(data?.mainFeatures?.chipSet)}</p>
+                    <p class="card-text"><strong>DisplaySize:</strong> ${properityContent(data?.mainFeatures?.displaySize)}</p>
+                    <p class="card-text"><strong>Memory:</strong> ${properityContent(data?.mainFeatures?.memory)}</p>
+                    <p class="card-text"><strong>Storage:</strong> ${properityContent(data?.mainFeatures?.storage)}</p>
+                </div>
+            </div>         
+        `
+        phoneDetails.appendChild(div)
+
+
+    console.log(data?.mainFeatures)
+    // console.log(properityContent(data?.others))
+    // console.log(properityContent(data?.releaseDate))
+    // console.log(typeof(data?.releaseDate))
+    // console.log(data?.releaseDate)
+    // console.log(properityContent(data?.mainFeatures))
+    // console.log(properityContent(data?.mainFeatures?.sensors.toString()))
 }
 
 
+const properityContent = (target) => {
+    if(target != undefined && target != ''){
+        return  target
+    }else {
+        return ' info Not available'
+    }
+}
+
+const cleanInnerHtml = (id) => {
+   const element =  document.getElementById(id)
+   element.innerHTML = ''
+   return element
+}
