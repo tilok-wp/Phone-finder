@@ -1,8 +1,15 @@
 // Get search value
 const getSearchText = () => {
     const searchText = document.getElementById('search-text')
-    let searchValue = searchText.value
-    loadPhoneData(searchValue)
+    let searchValue = searchText.value.toLowerCase()
+    if(searchValue != ''){
+        loadPhoneData(searchValue)
+    }else{
+        const searchMessage = document.getElementById('search-message')
+        searchMessage.classList.add('text-danger')
+        searchMessage.innerText = `Please write some text`
+
+    }
     searchText.value = ''
 }
 
@@ -16,12 +23,20 @@ const loadPhoneData = searchText => {
 const displaySearchResult = (phoneList) =>{
     const searchResult = document.getElementById('search-result')
     searchResult.innerHTML = ''
-    const findPhoneCount = document.getElementById('find-phone-count')
-    findPhoneCount.innerText = `Search result: ${phoneList.length} Phones found`
+    const searchMessage = document.getElementById('search-message')
+    console.log()
+    if(phoneList.length > 0){
+        searchMessage.classList.remove('text-danger')
+        searchMessage.innerText = `Search result: ${phoneList.length} Phones found`
+        
+    }else{
+        searchMessage.classList.add('text-danger')
+        searchMessage.innerText = `No phone Found`
+    }
 
     let count = 1
     phoneList.forEach(phone => {
-        if(count <=20){
+        if(count <=2000){
             const div = document.createElement('div')
             div.classList.add('col-12')
             div.classList.add('col-md-4')
@@ -46,7 +61,6 @@ const displaySearchResult = (phoneList) =>{
 
 const loadDetails = (idName) => {
     const url = `https://openapi.programming-hero.com/api/phone/${idName}`
-    console.log(url)
     fetch(url)
     .then(request => request.json())
     .then(dataObject => displayPhoneDetails(dataObject.data))
@@ -55,11 +69,12 @@ const loadDetails = (idName) => {
 
 const displayPhoneDetails = (data) => {
     const phoneDetails = document.getElementById('phone-details')
+    phoneDetails.innerHTML = ''
     const div = document.createElement('div')
     div.classList.add('col-12')
     div.classList.add('my-3')
     div.innerHTML = `
-        <div class="card p-3 text-center">
+        <div class="card d-flex flex-row p-3">
             <img src="${data.image}" class="card-img-top" alt="${data.phone_name}">
             <div class="card-body">
             <h5 class="card-title">${data.name}</h5>
