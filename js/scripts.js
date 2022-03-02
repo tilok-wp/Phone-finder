@@ -3,8 +3,9 @@ const getSearchText = () => {
     const searchText = document.getElementById('search-text')
     let searchValue = searchText.value.toLowerCase()
     if(searchValue != ''){
-        loadPhoneData(searchValue)
+        loadPhoneData('https://openapi.programming-hero.com/api/phones?search=', searchValue)
         cleanInnerHtml('phone-details')
+        spinnerDisplay('block')
     }else{
         cleanInnerHtml('search-result')
         cleanInnerHtml('phone-details')
@@ -15,16 +16,18 @@ const getSearchText = () => {
     searchText.value = ''
 }
 // Load data from API
-const loadPhoneData = searchText => {
-    const url = `https://openapi.programming-hero.com/api/phones?search=${searchText}`
+
+const loadPhoneData = (apiLink,searchText) => {
+    const url = apiLink.concat(searchText)
     fetch(url)
     .then(request => request.json())
-    .then(dataObject => displaySearchResult(dataObject.data))
+    .then(dataObject => displaySearchResult(dataObject.data, searchText))
 }
+
 // Display result option
-const displaySearchResult = (phoneList) =>{
+const displaySearchResult = (phoneList, searchText) =>{
+    spinnerDisplay('none')
     const searchResult = cleanInnerHtml('search-result')
-    // searchResult.innerHTML = ''
     const searchMessage = cleanInnerHtml('search-message')
     console.log()
     if(phoneList.length > 0){
@@ -39,6 +42,13 @@ const displaySearchResult = (phoneList) =>{
         if(count <=20){
             singleSearchContent(phone, searchResult)
             count++
+            if(count == 21){
+                const div = document.createElement('div')
+                div.classList.add('col-12')
+                div.classList.add('text-center')
+                div.innerHTML = `<div class="col-md-12 text-center"> <button class="btn btn-outline-primary px-4" type="button" id="load-more" onclick="load-more('${searchText}')">Load more</button> </div>`
+                searchResult.appendChild(div)
+            }
         }
     });
 }
@@ -117,11 +127,15 @@ const cleanInnerHtml = (id) => {
 const othersInfo =  (dataObject) => {
     if(dataObject != undefined && dataObject != ''){
         let paragraph = ''
-        for (const single in dataObject) {
-            paragraph += `<p><strong>${single}: </strong> ${dataObject[single]}</p>`
-        }
+        Object.entries(dataObject).forEach(([key, value]) => {
+            paragraph += `<p><strong>${key}: </strong> ${dataObject[key]}</p>`
+          })
         return paragraph
     }else {
         return 'No Others information found'
     }
+}
+
+const spinnerDisplay = ( noneBlock) => {
+    document.getElementById('spinner').style.display = noneBlock;
 }
