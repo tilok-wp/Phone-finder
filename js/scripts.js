@@ -3,7 +3,7 @@ const getSearchText = () => {
     const searchText = document.getElementById('search-text')
     let searchValue = searchText.value.toLowerCase()
     if(searchValue != ''){
-        loadPhoneData('https://openapi.programming-hero.com/api/phones?search=', searchValue)
+        loadPhoneData('https://openapi.programming-hero.com/api/phones?search=', searchValue, false)
         cleanInnerHtml('phone-details')
         spinnerDisplay('block')
     }else{
@@ -15,17 +15,24 @@ const getSearchText = () => {
     }
     searchText.value = ''
 }
-// Load data from API
+// Load more details option
+const loadMore = clicKtext => {
+    cleanInnerHtml('search-result')
+    cleanInnerHtml('search-message')
+    spinnerDisplay('block')
+    loadPhoneData('https://openapi.programming-hero.com/api/phones?search=',clicKtext, true)
+}
 
-const loadPhoneData = (apiLink,searchText) => {
+// Load data from API
+const loadPhoneData = (apiLink,searchText, isLoadMore) => {
     const url = apiLink.concat(searchText)
     fetch(url)
     .then(request => request.json())
-    .then(dataObject => displaySearchResult(dataObject.data, searchText))
+    .then(dataObject => displaySearchResult(dataObject.data, searchText, isLoadMore))
 }
 
 // Display result option
-const displaySearchResult = (phoneList, searchText) =>{
+const displaySearchResult = (phoneList, searchText, isLoadMore) =>{
     spinnerDisplay('none')
     const searchResult = cleanInnerHtml('search-result')
     const searchMessage = cleanInnerHtml('search-message')
@@ -39,17 +46,22 @@ const displaySearchResult = (phoneList, searchText) =>{
     }
     let count = 1
     phoneList.forEach(phone => {
-        if(count <=20){
+        if(isLoadMore){
             singleSearchContent(phone, searchResult)
-            count++
-            if(count == 21){
-                const div = document.createElement('div')
-                div.classList.add('col-12')
-                div.classList.add('text-center')
-                div.innerHTML = `<div class="col-md-12 text-center"> <button class="btn btn-outline-primary px-4" type="button" id="load-more" onclick="load-more('${searchText}')">Load more</button> </div>`
-                searchResult.appendChild(div)
+        }else{
+            if(count <=20){
+                singleSearchContent(phone, searchResult)
+                count++
+                if(count == 21){
+                    const div = document.createElement('div')
+                    div.classList.add('col-12')
+                    div.classList.add('text-center')
+                    div.innerHTML = `<div class="col-md-12 text-center"> <button class="btn btn-outline-primary px-4 btn-lg mt-3 my-5" type="button" id="load-more" onclick="loadMore('${searchText}')">Load more</button> </div>`
+                    searchResult.appendChild(div)
+                }
             }
         }
+
     });
 }
 
